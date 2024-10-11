@@ -9,9 +9,19 @@ class NoteManager:
     def load_notes(self):
         try:
             with open(self.file_name, 'r') as file:
-                notes_data = json.load(file)
+                # Проверяем, что файл не пустой
+                content = file.read().strip()
+                if not content:
+                    return []  # Возвращаем пустой список, если файл пустой
+                # Загружаем данные из файла
+                notes_data = json.loads(content)
                 return [Note.from_dict(note) for note in notes_data]
         except FileNotFoundError:
+            # Если файла нет, возвращаем пустой список
+            return []
+        except json.JSONDecodeError:
+            # Если ошибка при чтении JSON (например, файл поврежден), возвращаем пустой список
+            print("Ошибка: файл заметок поврежден или пуст. Создается новый файл.")
             return []
 
     def save_notes(self):
